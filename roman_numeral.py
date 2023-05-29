@@ -4,27 +4,53 @@ def roman_to_int(roman):
         'C': 100, 'D': 500, 'M': 1000,
     }
 
-    # Subtraction pairs
     subtract_pairs = {('I', 'V'), ('I', 'X'), ('X', 'L'),
                       ('X', 'C'), ('C', 'D'), ('C', 'M')}
 
     total = 0
     i = 0
     while i < len(roman):
-        # If this is a subtraction pair
         if i + 1 < len(roman) and (roman[i], roman[i+1]) in subtract_pairs:
             total += values[roman[i+1]] - values[roman[i]]
             i += 2
-        # Else just add this number
         else:
             total += values[roman[i]]
             i += 1
     return total
 
+def input_validation(roman):
+    roman_numerals = ['I', 'V', 'X', 'L', 'C', 'D', 'M']
+    values = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
+
+    for char in roman:
+        if char not in roman_numerals:
+            raise ValueError(f"Invalid character: {char}. Roman numerals can only include the characters 'I', 'V', 'X', 'L', 'C', 'D', 'M'.")
+
+    if 'VV' in roman or 'LL' in roman or 'DD' in roman:
+        raise ValueError("Invalid repetition. The Roman numerals 'V', 'L', and 'D' can't be repeated.")
+
+    if 'IIII' in roman or 'XXXX' in roman or 'CCCC' in roman or 'MMMM' in roman:
+        raise ValueError("Invalid repetition. The Roman numerals 'I', 'X', 'C', and 'M' can't be repeated more than 3 times consecutively.")
+
+    # Check for invalid subtraction sequences
+    for i in range(len(roman) - 1):
+        if values[roman[i]] < values[roman[i+1]]:
+            if i > 0 and values[roman[i-1]] <= values[roman[i]]:
+                raise ValueError(f"Invalid sequence: {roman[i-1:i+2]}. A group of numerals written in subtractive notation (of lower value) cannot precede a numeral of larger value. For example, write 'VIII' for 8, not 'IIX'; write 'XIX' for 19, not 'IXX'.")
+            if i + 2 < len(roman) and values[roman[i+2]] >= values[roman[i+1]]:
+                raise ValueError(f"Invalid sequence: {roman[i:i+3]}. A group of numerals written in subtractive notation (of lower value) cannot precede a numeral of larger value. For example, write 'VIII' for 8, not 'IIX'; write 'XIX' for 19, not 'IXX'.")
+
 def main():
-    roman = input("Enter a Roman numeral: ")
-    integer = roman_to_int(roman)
-    print(f"The decimal equivalent of {roman} is {integer}")
+    while True:
+        try:
+            roman = input("Enter a Roman numeral: ").upper()
+            input_validation(roman)
+            integer = roman_to_int(roman)
+            print(f"The decimal equivalent of {roman} is {integer}")
+            break
+        except ValueError as e:
+            print(e)
+            print("Please try again.")
 
 if __name__ == "__main__":
     main()
