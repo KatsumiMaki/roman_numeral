@@ -58,8 +58,9 @@ def main():
             integer = roman_to_int(roman)
             print(f"The decimal equivalent of {roman} is {integer}")
             break
-        except EOFError:
+        except (EOFError, KeyboardInterrupt):
             print("Exiting...")
+            break
         except ValueError as e:
             print(e)
             print("Please try again.")
