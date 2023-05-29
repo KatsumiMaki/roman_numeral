@@ -1,3 +1,5 @@
+import re
+
 def roman_to_int(roman):
     values = {
         'I': 1, 'V': 5, 'X': 10, 'L': 50,
@@ -19,6 +21,9 @@ def roman_to_int(roman):
     return total
 
 def input_validation(roman):
+    if not roman:
+        raise ValueError("Input string is empty. There is no way to write 0 in Roman numerals.")
+
     roman_numerals = ['I', 'V', 'X', 'L', 'C', 'D', 'M']
     values = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
 
@@ -40,6 +45,11 @@ def input_validation(roman):
             if i + 2 < len(roman) and values[roman[i+2]] >= values[roman[i+1]]:
                 raise ValueError(f"Invalid sequence: {roman[i:i+3]}. A group of numerals written in subtractive notation (of lower value) cannot precede a numeral of larger value. For example, write 'VIII' for 8, not 'IIX'; write 'XIX' for 19, not 'IXX'.")
 
+    # Check with regex for any other invalid cases
+    pattern = r'^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$'
+    if not re.match(pattern, roman):
+        raise ValueError("Not valid Roman numeral. Rules dictate separate representation of units, tens, hundreds, and thousands. Examples: 99 is XCIX, not IC. 999 is not IM, and 1999 is not MIM. Constraints: I precedes V or X, X precedes L or C, C precedes D or M.")
+
 def main():
     while True:
         try:
@@ -48,6 +58,8 @@ def main():
             integer = roman_to_int(roman)
             print(f"The decimal equivalent of {roman} is {integer}")
             break
+        except EOFError:
+            print("Exiting...")
         except ValueError as e:
             print(e)
             print("Please try again.")
